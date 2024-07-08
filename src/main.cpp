@@ -3,22 +3,25 @@
 #include <iostream>
 
 #include "RenderWindow.h"
+#include "entity.h"
 
 int main(int argc, char* args[])
 {
-    if (SDL_Init(SDL_INIT_VIDEO) > 0)
+    if (SDL_Init(SDL_INIT_VIDEO) > 0) // sdl init error
     {
         std::cout << "SDL_Init failed..." << SDL_GetError() << std::endl;
     }
 
-    if (!(IMG_Init(IMG_INIT_PNG)))
+    if (!(IMG_Init(IMG_INIT_PNG))) // image init error
     {
         std::cout << "IMG_Init failed..." << SDL_GetError() << std::endl;
     }
 
     RenderWindow window("SDL Game v0.1", 1280, 720);
 
-    SDL_Texture* grassTexture = window.loadTexture("res/gfx/ground_grass_1.png");
+    SDL_Texture* grassTexture = window.loadTexture("res/gfx/ground_grass_1.png"); // grass texture
+
+    Entity platform0(100, 50, grassTexture);
 
     bool isRunning = true;
 
@@ -28,16 +31,26 @@ int main(int argc, char* args[])
     {
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
-                isRunning = false;
+            switch (event.type)
+            {
+                case SDL_QUIT: // you have a brain
+                    isRunning = false;
+                    break;
+                
+                case SDL_KEYDOWN: // press escape to close window
+                    if (event.key.keysym.sym == SDLK_ESCAPE)
+                    {
+                        isRunning = false;
+                    }
+            }
         }
 
-        window.clear();
-        window.render(grassTexture);
-        window.display();
+        window.clear(); // clear screen
+        window.render(platform0); // render texture
+        window.display(); // display rendered texture
     }
 
-    window.cleanUp();
+    window.cleanUp(); // destroy window
     SDL_Quit();
     
     return 0;
