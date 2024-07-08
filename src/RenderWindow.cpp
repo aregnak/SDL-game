@@ -32,6 +32,17 @@ SDL_Texture* RenderWindow::loadTexture(const char* p_filePath)
     return texture;
 }
 
+int RenderWindow::getRefRate()
+{
+    int dispIndex = SDL_GetWindowDisplayIndex(window);
+
+    SDL_DisplayMode mode;
+
+    SDL_GetDisplayMode(dispIndex, 0, &mode);
+
+    return mode.refresh_rate;
+}
+
 void RenderWindow::cleanUp()
 {
     SDL_DestroyWindow(window);
@@ -51,8 +62,8 @@ void RenderWindow::render(Entity& p_entity)
     src.h = p_entity.getCurrentFrame().h;
 
     SDL_Rect dest;
-    dest.x = p_entity.getx() * 4;
-    dest.y = p_entity.gety() * 4;
+    dest.x = p_entity.getPos().x * 4;
+    dest.y = p_entity.getPos().y * 4;
     dest.w = p_entity.getCurrentFrame().w * 4;
     dest.h = p_entity.getCurrentFrame().h * 4;
 

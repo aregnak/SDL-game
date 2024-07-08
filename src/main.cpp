@@ -1,9 +1,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
+#include <vector>
 
 #include "RenderWindow.h"
 #include "entity.h"
+#include "utils.h"
+
 
 int main(int argc, char* args[])
 {
@@ -21,33 +24,66 @@ int main(int argc, char* args[])
 
     SDL_Texture* grassTexture = window.loadTexture("res/gfx/ground_grass_1.png"); // grass texture
 
-    Entity platform0(100, 50, grassTexture);
+    std::vector<Entity> entities = {Entity(Vec2f(0, 0), grassTexture),
+                                    Entity(Vec2f(32, 32), grassTexture),
+                                    Entity(Vec2f(64, 64), grassTexture)};
 
     bool isRunning = true;
 
     SDL_Event event;
 
+    const float timestep = 0.1f;
+    float accumulator = 0.0f;
+    float currentTime = utils::hireTime();
+
     while (isRunning)
     {
-        while (SDL_PollEvent(&event))
+        int startTick = SDL_GetTicks64();
+
+        float newTime = utils::hireTime();
+        float frameTime = newTime - currentTime;
+
+        currentTime = newTime;
+
+        accumulator += frameTime;
+
+        while (accumulator >= timestep)
         {
-            switch (event.type)
+            while (SDL_PollEvent(&event))
             {
-                case SDL_QUIT: // you have a brain
-                    isRunning = false;
-                    break;
-                
-                case SDL_KEYDOWN: // press escape to close window
-                    if (event.key.keysym.sym == SDLK_ESCAPE)
-                    {
+                switch (event.type)
+                {
+                    case SDL_QUIT: // you have a brain
                         isRunning = false;
-                    }
+                        break;
+                    
+                    case SDL_KEYDOWN: // press escape to close window
+                        if (event.key.keysym.sym == SDLK_ESCAPE)
+                        {
+                            isRunning = false;
+                        }
+                }
             }
+
+            accumulator -= timestep;
         }
+        
+        const float alpha = accumulator / timestep;
 
         window.clear(); // clear screen
-        window.render(platform0); // render texture
+
+        for (Entity& i : entities)
+        {
+            window.render(i);
+        }
         window.display(); // display rendered texture
+
+        int frameTicks = SDL_GetTicks64() - startTick;
+
+        if (frameTicks < window.getRefRate())
+        {  
+            SDL_Delay(1000 / window.getRefRate() - frameTicks);
+        }
     }
 
     window.cleanUp(); // destroy window
