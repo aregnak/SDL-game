@@ -7,6 +7,9 @@
 #include "RenderWindow.h"
 #include "entity.h"
 
+#define SW 1280
+#define SH 720
+
 std::vector<Entity> createPlatform(SDL_Texture* grassTexture)
 {
     int plat_x = 0;
@@ -14,7 +17,7 @@ std::vector<Entity> createPlatform(SDL_Texture* grassTexture)
 
     std::vector<Entity> platform = { Entity(Vec2f(plat_x, plat_y), grassTexture) };
 
-    while (plat_x <= 1248)
+    while (plat_x <= (SW - 32))
     {
         plat_x += 32;
 
@@ -36,9 +39,13 @@ int main(int argc, char* args[])
         std::cout << "IMG_Init failed..." << SDL_GetError() << std::endl;
     }
 
-    RenderWindow window("SDL Game v0.1", 1280, 720);
+    RenderWindow window("SDL Game v0.1", SW, SH);
 
     SDL_Texture* grassTexture = window.loadTexture("res/gfx/ground_grass_1.png"); // grass texture
+
+    SDL_Rect playerRect = { 20, 20, 1, 1 };
+
+    SDL_Texture* playerModel = window.loadTexture("res/gfx/player.png"); // player texture
 
     bool isRunning = true;
 
@@ -60,6 +67,25 @@ int main(int argc, char* args[])
                         isRunning = false;
                     }
             }
+
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_UP:
+                    playerRect.y -= 5;
+                    break;
+
+                case SDLK_DOWN:
+                    playerRect.y += 5;
+                    break;
+
+                case SDLK_RIGHT:
+                    playerRect.x += 5;
+                    break;
+
+                case SDLK_LEFT:
+                    playerRect.x -= 5;
+                    break;
+            }
         }
 
         window.clear(); // clear screen
@@ -68,6 +94,13 @@ int main(int argc, char* args[])
         {
             window.render(i);
         }
+
+        Entity player = Entity(Vec2f(playerRect.x, playerRect.y), playerModel);
+
+        window.render(player);
+
+        window.rendPlayer(playerRect);
+
         window.display(); // display rendered texture
     }
 

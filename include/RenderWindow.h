@@ -17,6 +17,8 @@ public:
     void clear();
     void render(Entity& p_entity);
     void display();
+    void rendPlayer(SDL_Rect p_playerRect);
+
 private:
     SDL_Window* window;
     SDL_Renderer* renderer;

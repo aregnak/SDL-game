@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_render.h>
 #include <iostream>
 
 #include "RenderWindow.h"
@@ -50,6 +52,7 @@ void RenderWindow::cleanUp()
 
 void RenderWindow::clear()
 {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 }
 
@@ -73,4 +76,10 @@ void RenderWindow::render(Entity& p_entity)
 void RenderWindow::display()
 {
     SDL_RenderPresent(renderer);
+}
+
+void RenderWindow::rendPlayer(SDL_Rect p_playerRect)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderFillRect(renderer, &p_playerRect);
 }
