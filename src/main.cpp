@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_timer.h>
 #include <iostream>
 #include <vector>
 
@@ -29,6 +30,12 @@ std::vector<Entity> createPlatform(SDL_Texture* grassTexture)
 
 int main(int argc, char* args[])
 {
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
+
+    Uint32 frameStart;
+    int frameTime;
+
     if (SDL_Init(SDL_INIT_VIDEO) > 0) // sdl init error
     {
         std::cout << "SDL_Init failed..." << SDL_GetError() << std::endl;
@@ -55,6 +62,8 @@ int main(int argc, char* args[])
     {
         while (SDL_PollEvent(&event))
         {
+            frameStart = SDL_GetTicks64();
+
             switch (event.type)
             {
                 case SDL_QUIT: // you have a brain
@@ -102,6 +111,13 @@ int main(int argc, char* args[])
         window.rendPlayer(playerRect);
 
         window.display(); // display rendered texture
+
+        frameTime = SDL_GetTicks64() - frameStart;
+
+        if (frameDelay > frameTime)
+        {
+            SDL_Delay(frameDelay - frameTime);
+        }
     }
 
     window.cleanUp(); // destroy window
